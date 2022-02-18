@@ -1,4 +1,4 @@
-import {GeneralMultipliers} from "const.js"
+import {GeneralMultipliers, TaskPort, TargetPort} from "const.js"
 /** @param {NS} ns **/
 export async function main(ns) {
 	//define the waiting delay
@@ -13,9 +13,9 @@ export async function main(ns) {
 	while(botrunning) {
 		try {
 			//receive the task via ports
-			let task = await ns.readPort(1);
+			let task = await ns.readPort(TaskPort);
 			//receive the target via ports
-			let target = await ns.readPort(2);
+			let target = await ns.readPort(TargetPort);
 			if(task != "NULL PORT DATA" && target != "NULL PORT DATA") {
 				//calculate the maximum and used ram
 				let hostmaxram = ns.getServerMaxRam(ns.getHostname());
