@@ -17,7 +17,7 @@ export async function main(ns) {
 			//get the current server
 			let server = servers.serverList[i];
 			//if there is root access to the server and it has more than 0 gb ram
-			if(server.rootaccess && server.ishackable && server.maxram > 0 && server.servername != "home") {
+			if(server.rootaccess && server.maxram > 0 && server.servername != "home") {
 				//check, if deployable scripts are already on the server, if not copy them
 				for(let scriptname of DeployableScripts) {
 					//if the deployable scripts do not exist, copy them
@@ -39,6 +39,9 @@ export async function main(ns) {
 					//run bot.js on the server
 					ns.exec("bot.js", server.servername, 1, (watchdelay * 2));
 				}
+			}
+			//if there is root access to the server and it has more than 0 gb ram and sever is hackable
+			if(server.rootaccess && server.ishackable && server.maxram > 0 && server.servername != "home") {
 				//if the server's security level is equal or bigger than its base security level, try to queue
 				if(server.securitylevel > ns.getServerMinSecurityLevel(server.servername)) {
 					await ns.tryWritePort(TaskPort, "weaken");
