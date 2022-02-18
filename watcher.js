@@ -44,13 +44,21 @@ export async function main(ns) {
 			if(server.rootaccess && server.ishackable && server.maxram > 0 && server.servername != "home") {
 				//if the server's security level is equal or bigger than its base security level, try to queue
 				if(server.securitylevel > ns.getServerMinSecurityLevel(server.servername)) {
-					await ns.tryWritePort(TaskPort, "weaken");
-					await ns.tryWritePort(TargetPort, server.servername);
+					while(!await ns.tryWritePort(TaskPort, "weaken")) {
+						await ns.asleep(watchdelay);
+					}
+					while(!await ns.tryWritePort(TargetPort, server.servername)) {
+						await ns.asleep(watchdelay);
+					}
 				}
 				//if min security level was reached and max money not, grow
 				else if(ns.getServerMoneyAvailable(server.servername) < ns.getServerMaxMoney(server.servername)) {
-					await ns.tryWritePort(TaskPort, "grow");
-					await ns.tryWritePort(TargetPort, server.servername);
+					while(!await ns.tryWritePort(TaskPort, "grow")) {
+						await ns.asleep(watchdelay);
+					}
+					while(!await ns.tryWritePort(TargetPort, server.servername)) {
+						await ns.asleep(watchdelay);
+					}
 				}
 				//if security level is at minimum and money is at maximum add the server to the hackable servers
 				else {
@@ -70,8 +78,12 @@ export async function main(ns) {
 			for(let i = 0; i < hackableservers.length; i++) {
 				//the efficiency sorted servers are tried to get hacked one after another
 				let server = hackableservers[i];
-				await ns.tryWritePort(TaskPort, "hack");
-				await ns.tryWritePort(TargetPort, server.servername);
+				while(!await ns.tryWritePort(TaskPort, "hack")) {
+					await ns.asleep(watchdelay);
+				}
+				while(!await ns.tryWritePort(TargetPort, server.servername)) {
+					await ns.asleep(watchdelay);
+				}
 			}
 		}
 		//if there are no hackable servers
@@ -84,13 +96,21 @@ export async function main(ns) {
 				if(server.rootaccess && server.ishackable && server.maxram > 0 && server.servername != "home") {
 					//if minimum security level is not reached, weaken
 					if(server.securitylevel > ns.getServerMinSecurityLevel(server.servername)) {
-						await ns.tryWritePort(TaskPort, "weaken");
-						await ns.tryWritePort(TargetPort, server.servername);
+						while(!await ns.tryWritePort(TaskPort, "weaken")) {
+							await ns.asleep(watchdelay);
+						}
+						while(!await ns.tryWritePort(TargetPort, server.servername)) {
+							await ns.asleep(watchdelay);
+						}
 					}
 					//if minimum security level is reached, hack
 					else {
-						await ns.tryWritePort(TaskPort, "hack");
-						await ns.tryWritePort(TargetPort, server.servername);
+						while(!await ns.tryWritePort(TaskPort, "hack")) {
+							await ns.asleep(watchdelay);
+						}
+						while(!await ns.tryWritePort(TargetPort, server.servername)) {
+							await ns.asleep(watchdelay);
+						}
 					}
 				}
 			}
