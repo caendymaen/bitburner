@@ -3,7 +3,7 @@ This is all work in progress, only a few of my scripts will be deployed.
 They are also just going to be deployed, if I think, that they are finished.
 
 # sidebar.js
-**RAM usage:** 28.20 GB
+**RAM usage:** *28.20 GB*
 
 This script lets you add new items to the sidebar menu.
 
