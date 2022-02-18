@@ -17,7 +17,7 @@ export async function main(ns) {
 			//get the current server
 			let server = servers.serverList[i];
 			//if there is root access to the server and it has more than 0 gb ram
-			if(server.rootaccess && server.maxram > 0 && server.servername != "home") {
+			if(server.rootaccess && server.ishackable && server.maxram > 0 && server.servername != "home") {
 				//check, if deployable scripts are already on the server, if not copy them
 				for(let scriptname of DeployableScripts) {
 					//if the deployable scripts do not exist, copy them
@@ -78,7 +78,7 @@ export async function main(ns) {
 				//create a server object
 				let server = servers.serverList[i];
 				//if there is root access to the server and it has more than 0 gb ram
-				if(server.rootaccess && server.maxram > 0 && server.servername != "home") {
+				if(server.rootaccess && server.ishackable && server.maxram > 0 && server.servername != "home") {
 					//if minimum security level is not reached, weaken
 					if(server.securitylevel > ns.getServerMinSecurityLevel(server.servername)) {
 						await ns.tryWritePort(TaskPort, "weaken");
