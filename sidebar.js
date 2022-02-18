@@ -84,9 +84,8 @@ export async function main(ns) {
 			menuitem.appendChild(menuitemDIV);
 			//add functionallity to open the given script
 			menuitem.addEventListener("click", async function() {
-				//usually I just use ns.isRunning(itemscript, ns.getHostname())
-				//as for my usecase I just add 1 menu item to the sidebar
-				if(await ns.isRunning(itemscript, ns.getHostname(), itemname, itemscript)) {
+				//if the script to call is already running, just show a warning
+				if(await ns.isRunning(itemscript, ns.getHostname())) {
 					await ns.toast(itemscript + " is already running", "warning", 5000);
 				}
 				else {
