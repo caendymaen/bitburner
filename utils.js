@@ -1,13 +1,3 @@
-//define a constant for general multipliers
-export const GeneralMultipliers = {
-	maxServerMoney: 1,
-	minServerSecurity: 1
-};
-//define constants for port handling
-export const TaskPort = 1;
-export const TargetPort = 2;
-//define a constant for scripts to deploy on servers
-export const DeployableScripts = ["weaken.js", "grow.js", "hack.js", "bot.js"];
 /** Class representing some player details */
 export class PlayerDetails {
 	/**
@@ -329,7 +319,7 @@ export class ServerList {
 			let gTime = this.ns.getGrowTime(servername) / 1000;
 			let wTime = this.ns.getWeakenTime(servername) / 1000;
 			let hTime = this.ns.getHackTime(servername) / 1000;
-			//calculate the chance of hacking the server
+			//calculate the chance of hacking the server 
 			let hChance = this.ns.hackAnalyzeChance(servername);
 			//calculate the efficiency (money/s)
 			//prevent from infinity calculations
