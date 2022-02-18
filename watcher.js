@@ -40,7 +40,7 @@ export async function main(ns) {
 					ns.exec("bot.js", server.servername, 1, (watchdelay * 2));
 				}
 			}
-			//if there is root access to the server and it has more than 0 gb ram and sever is hackable
+			//if there is root access to the server and it has more than 0 gb ram and sever is hackable create the strategy
 			if(server.rootaccess && server.ishackable && server.maxram > 0 && server.servername != "home") {
 				//if the server's security level is equal or bigger than its base security level, try to queue
 				if(server.securitylevel > ns.getServerMinSecurityLevel(server.servername)) {
