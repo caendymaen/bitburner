@@ -47,12 +47,12 @@ export async function main(ns) {
 			//create the new menu item
 			let menuitem = document.createElement("div");
 			menuitem.id = itemid;
-			//create a ruler
+			//create a ruler - add all the CSS classes used by Bitburner for correct formatting
 			let menuitemHR = document.createElement("hr");
 			menuitemHR.classList.add("MuiDivider-root");
 			menuitemHR.classList.add("MuiDivider-fullWidth");
 			menuitemHR.classList.add("css-8dakje");
-			//create the actual menu item
+			//create the actual menu item - add all the CSS classes used by Bitburner for correct formatting
 			let menuitemDIV = document.createElement("div");
 			menuitemDIV.classList.add("MuiButtonBase-root");
 			menuitemDIV.classList.add("MuiListItem-root");
@@ -60,12 +60,12 @@ export async function main(ns) {
 			menuitemDIV.classList.add("MuiListItem-padding");
 			menuitemDIV.classList.add("MuiListItem-button");
 			menuitemDIV.classList.add("css-1e1vz9s");
-			//create the container for the icon
+			//create the container for the icon - add all the CSS classes used by Bitburner for correct formatting
 			let menuitemIcon = document.createElement("div");
 			menuitemIcon.classList.add("MuiListItemIcon-root");
 			menuitemIcon.classList.add("css-1f8bwsm");
 			menuitemIcon.innerHTML = itemicon;
-			//create the container for the item name
+			//create the container for the item name - add all the CSS classes used by Bitburner for correct formatting
 			let menuitemName = document.createElement("div");
 			menuitemName.classList.add("MuiListItemText-root");
 			menuitemName.classList.add("css-1tsvksn");
