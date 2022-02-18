@@ -1,4 +1,5 @@
-import {GeneralMultipliers, DeployableScripts, TaskPort, TargetPort, ServerList} from "utils.js";
+import {ServerList} from "utils.js";
+import {DeployableScripts, TaskPort, TargetPort, GeneralMultipliers} from "const.js"
 /** @param {NS} ns **/
 export async function main(ns) {
 	//define a general delay for looping/watching
