@@ -36,6 +36,12 @@ This script defines 2 classes
 **ServerList**: collects all servers and collects some details about them
 
 
+# root.js
+>**RAM usage:** *12.00 GB*
+
+This script defines a class with functionallity to root one or all servers
+
+
 # bot.js
 >**RAM usage:** *5.75 GB*
 
