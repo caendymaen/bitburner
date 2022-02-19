@@ -87,11 +87,11 @@ export async function main(ns) {
 				//get current server max ram
 				let serverram = ns.getServerMaxRam(servername);
 				//check, if upgrade from server is possible
-				if((serverram * 2) < ns.getPurchasedServerMaxRam()) {
+				if(serverram < ns.getPurchasedServerMaxRam()) {
 					if(ns.getServerMoneyAvailable("home") > ns.getPurchasedServerCost(serverram * 2)) {
 						await ns.killall(servername);
 						await ns.deleteServer(servername);
-						await ns.purchaseServer(servername, serverram * 2);
+						await ns.purchaseServer(servername, (serverram * 2));
 						//check, if deployable scripts are already on the server, if not copy them
 						for(let scriptname of DeployableScripts) {
 							//if the deployable scripts do not exist, copy them
