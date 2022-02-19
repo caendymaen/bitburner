@@ -1,12 +1,16 @@
 import {ServerList} from "utils.js";
-import {DeployableScripts, TaskPort, TargetPort, GeneralMultipliers} from "const.js"
+import {DeployableScripts, TaskPort, TargetPort, GeneralMultipliers, GeneralDelay, BotDelayMultiplier} from "const.js"
 /** @param {NS} ns **/
 export async function main(ns) {
 	//define a general delay for looping/watching
-	let watchdelay = 50;
+	let watchdelay = GeneralDelay;
 	//clear ports that are important for watcher<>bot communication
-	await ns.clearPort(TaskPort);
-	await ns.clearPort(TargetPort);
+	for(let i = 0; i < TaskPort.length; i++) {
+		await ns.clearPort(TaskPort[i]);
+	}
+	for(let i = 0; i < TargetPort.length; i++) {
+		await ns.clearPort(TargetPort[i]);
+	}
 	//create the list of servers
 	let servers = new ServerList(ns);
 	//run through the list of servers
@@ -34,7 +38,7 @@ export async function main(ns) {
 			//let it run bot.js and any additional script (weaken.js, grow.js, hack.js)
 			if(!ns.scriptRunning("bot.js", server.servername) && (server.maxram > ((ns.getScriptRam("bot.js", server.servername) + ns.getScriptRam("weaken.js", server.servername))))) {
 				//run bot.js on the server
-				ns.exec("bot.js", server.servername, 1, (watchdelay * 2));
+				ns.exec("bot.js", server.servername, 1, (watchdelay * BotDelayMultiplier));
 			}
 		}
 	}
@@ -63,27 +67,29 @@ export async function main(ns) {
 				//let it run bot.js and any additional script (weaken.js, grow.js, hack.js)
 				if(!ns.scriptRunning("bot.js", server.servername) && (server.maxram > ((ns.getScriptRam("bot.js", server.servername) + ns.getScriptRam("weaken.js", server.servername))))) {
 					//run bot.js on the server
-					ns.exec("bot.js", server.servername, 1, (watchdelay * 2));
+					ns.exec("bot.js", server.servername, 1, (watchdelay * BotDelayMultiplier));
 				}
 			}
 			//if there is root access to the server and it has more than 0 gb ram and sever is hackable create the strategy
 			if(server.rootaccess && server.ishackable && server.servername != "home") {
 				//if the server's security level is equal or bigger than its base security level, try to queue
 				if(server.securitylevel > (ns.getServerMinSecurityLevel(server.servername) * GeneralMultipliers.minServerSecurity)) {
-					while(!await ns.tryWritePort(TaskPort, "weaken")) {
-						await ns.asleep(watchdelay);
-					}
-					while(!await ns.tryWritePort(TargetPort, server.servername)) {
-						await ns.asleep(watchdelay);
+					for(let i = 0; i < TaskPort.length; i++) {
+						let twptask = await ns.tryWritePort(TaskPort[i], "weaken");
+						let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
+						if(twptask && twptarget) {
+							break;
+						}
 					}
 				}
 				//if min security level was reached and max money not, grow
 				else if(ns.getServerMoneyAvailable(server.servername) < (ns.getServerMaxMoney(server.servername) * GeneralMultipliers.maxServerMoney)) {
-					while(!await ns.tryWritePort(TaskPort, "grow")) {
-						await ns.asleep(watchdelay);
-					}
-					while(!await ns.tryWritePort(TargetPort, server.servername)) {
-						await ns.asleep(watchdelay);
+					for(let i = 0; i < TaskPort.length; i++) {
+						let twptask = await ns.tryWritePort(TaskPort[i], "grow");
+						let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
+						if(twptask && twptarget) {
+							break;
+						}
 					}
 				}
 				//if security level is at minimum and money is at maximum add the server to the hackable servers
@@ -104,11 +110,12 @@ export async function main(ns) {
 			for(let i = 0; i < hackableservers.length; i++) {
 				//the efficiency sorted servers are tried to get hacked one after another
 				let server = hackableservers[i];
-				while(!await ns.tryWritePort(TaskPort, "hack")) {
-					await ns.asleep(watchdelay);
-				}
-				while(!await ns.tryWritePort(TargetPort, server.servername)) {
-					await ns.asleep(watchdelay);
+				for(let i = 0; i < TaskPort.length; i++) {
+					let twptask = await ns.tryWritePort(TaskPort[i], "hack");
+					let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
+					if(twptask && twptarget) {
+						break;
+					}
 				}
 			}
 		}
@@ -122,20 +129,22 @@ export async function main(ns) {
 				if(server.rootaccess && server.ishackable && server.maxram > 0 && server.servername != "home") {
 					//if minimum security level is not reached, weaken
 					if(server.securitylevel > (ns.getServerMinSecurityLevel(server.servername) * GeneralMultipliers.minServerSecurity)) {
-						while(!await ns.tryWritePort(TaskPort, "weaken")) {
-							await ns.asleep(watchdelay);
-						}
-						while(!await ns.tryWritePort(TargetPort, server.servername)) {
-							await ns.asleep(watchdelay);
+						for(let i = 0; i < TaskPort.length; i++) {
+							let twptask = await ns.tryWritePort(TaskPort[i], "weaken");
+							let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
+							if(twptask && twptarget) {
+								break;
+							}
 						}
 					}
 					//if minimum security level is reached, hack
 					else {
-						while(!await ns.tryWritePort(TaskPort, "hack")) {
-							await ns.asleep(watchdelay);
-						}
-						while(!await ns.tryWritePort(TargetPort, server.servername)) {
-							await ns.asleep(watchdelay);
+						for(let i = 0; i < TaskPort.length; i++) {
+							let twptask = await ns.tryWritePort(TaskPort[i], "hack");
+							let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
+							if(twptask && twptarget) {
+								break;
+							}
 						}
 					}
 				}
