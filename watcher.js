@@ -74,6 +74,7 @@ export async function main(ns) {
 			if(server.rootaccess && server.ishackable && server.servername != "home") {
 				//if the server's security level is equal or bigger than its base security level, try to queue
 				if(server.securitylevel > (ns.getServerMinSecurityLevel(server.servername) * GeneralMultipliers.minServerSecurity)) {
+					//check TaskPort + its backups
 					for(let i = 0; i < TaskPort.length; i++) {
 						let twptask = await ns.tryWritePort(TaskPort[i], "weaken");
 						let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
@@ -84,6 +85,7 @@ export async function main(ns) {
 				}
 				//if min security level was reached and max money not, grow
 				else if(ns.getServerMoneyAvailable(server.servername) < (ns.getServerMaxMoney(server.servername) * GeneralMultipliers.maxServerMoney)) {
+					//check TaskPort + its backups
 					for(let i = 0; i < TaskPort.length; i++) {
 						let twptask = await ns.tryWritePort(TaskPort[i], "grow");
 						let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
@@ -110,6 +112,7 @@ export async function main(ns) {
 			for(let i = 0; i < hackableservers.length; i++) {
 				//the efficiency sorted servers are tried to get hacked one after another
 				let server = hackableservers[i];
+				//check TaskPort + its backups
 				for(let i = 0; i < TaskPort.length; i++) {
 					let twptask = await ns.tryWritePort(TaskPort[i], "hack");
 					let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
@@ -129,6 +132,7 @@ export async function main(ns) {
 				if(server.rootaccess && server.ishackable && server.maxram > 0 && server.servername != "home") {
 					//if minimum security level is not reached, weaken
 					if(server.securitylevel > (ns.getServerMinSecurityLevel(server.servername) * GeneralMultipliers.minServerSecurity)) {
+						//check TaskPort + its backups
 						for(let i = 0; i < TaskPort.length; i++) {
 							let twptask = await ns.tryWritePort(TaskPort[i], "weaken");
 							let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
@@ -139,6 +143,7 @@ export async function main(ns) {
 					}
 					//if minimum security level is reached, hack
 					else {
+						//check TaskPort + its backups
 						for(let i = 0; i < TaskPort.length; i++) {
 							let twptask = await ns.tryWritePort(TaskPort[i], "hack");
 							let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
