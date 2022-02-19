@@ -1,6 +1,6 @@
 # bitburner
-This is all work in progress, only a few of my scripts will be deployed.
-They are also just going to be deployed, if I think, that they are finished.
+This is all work in progress, only a few of my scripts will be deployed
+They are also just going to be deployed, if I think, that they are some kind of working
 
 # const.js
 >**RAM usage:** *1.60 GB*
