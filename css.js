@@ -195,6 +195,7 @@ export async function getBrowserCSS() {
 		}\
 		.serverinfo {\
 			color: #888888;\
+			text-align: left;\
 			margin: 0px;\
 			margin-top: 10px;\
 			margin-bottom: 10px;\
@@ -221,6 +222,7 @@ export async function getBrowserCSS() {
 		}\
 		.serverinfoname {\
 			font-size: 16px;\
+			text-align: left;\
 		}\
 		.goodcolor {\
 			color: #00cc00;\
@@ -228,9 +230,13 @@ export async function getBrowserCSS() {
 		.badcolor {\
 			color: #cc0000;\
 		}\
+		.neutralcolor {\
+			color: #f0ca00;\
+		}\
 		.standardcolor {\
 			color: #888888;\
 		}\
+		.serverblock{}\
 	";
 	return cssstring;
 }
