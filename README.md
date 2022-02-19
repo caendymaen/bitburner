@@ -67,3 +67,10 @@ runs the bot.js on them and also upgrades them if possible
 This script lets you add new items to the sidebar menu.
 
 2 arguments are needed, the first one is the item's name and the second one is a script to call.
+
+
+# dragndrop.js
+>**RAM usage:** *1.60 GB*
+
+This script contains a function to make a HTML element draggable
+it needs a container which is the one where the functionallity should have an effect and the actual draggable container
