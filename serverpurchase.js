@@ -72,6 +72,7 @@ export async function main(ns) {
 					if(!ns.scriptRunning("bot.js", servername) && (ns.getServerMaxRam(servername) > ((ns.getScriptRam("bot.js", servername) + ns.getScriptRam("weaken.js", servername))))) {
 						//run bot.js on the server
 						ns.exec("bot.js", servername, 1, (purchasedelay * BotDelayMultiplier));
+						await ns.toast("new server " + servername + " bought and bot.js deployed", "success", 5000);
 					}
 				}
 			}
@@ -111,6 +112,7 @@ export async function main(ns) {
 						if(!ns.scriptRunning("bot.js", servername) && (ns.getServerMaxRam(servername) > ((ns.getScriptRam("bot.js", servername) + ns.getScriptRam("weaken.js", servername))))) {
 							//run bot.js on the server
 							ns.exec("bot.js", servername, 1, (purchasedelay * BotDelayMultiplier));
+							await ns.toast("upgraded server " + servername + " and deployed bot.js", "info", 5000);
 						}
 					}
 				}
