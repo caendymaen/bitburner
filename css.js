@@ -91,7 +91,10 @@ export async function getBrowserCSS() {
 			overscroll-behavior: contain;\
 			padding: 15px;\
   			box-sizing: border-box;\
-			text-align: center;\
+			text-align: left;\
+		}\
+		#bitBrowserContentWindow h1 {\
+			padding: 25px;\
 		}\
 		\
 		#bitBrowserMenu #bitBrowserMenuWindow ul {\
@@ -237,6 +240,23 @@ export async function getBrowserCSS() {
 			color: #888888;\
 		}\
 		.serverblock{}\
+		#serversearch {\
+			font-family: Lucida Console, Lucida Sans Unicode, Fira Mono, Consolas, Courier New, monospace;\
+			position: fixed;\
+			transform: translate(25px, -120px);\
+			border: 1px solid #444444;\
+			background-color: rgba(0, 0, 0, 0.8);\
+			color: #888888;\
+			padding: 5px;\
+			width: 300px;\
+		}\
+		#serversearch:hover, #serversearch:focus, #serversearch:active {\
+			border: 1px solid #00cc00;\
+			outline: none;\
+		}\
+		#serversearch::-webkit-search-cancel-button {\
+			display: none;\
+		}\
 	";
 	return cssstring;
 }
