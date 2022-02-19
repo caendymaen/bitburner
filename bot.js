@@ -1,4 +1,4 @@
-import {GeneralMultipliers, TaskPort, TargetPort} from "const.js"
+import {GeneralMultipliers, TaskPort, TargetPort, BotMaxHacksPerTarget} from "const.js"
 /** @param {NS} ns **/
 export async function main(ns) {
 	//define the waiting delay
@@ -13,9 +13,18 @@ export async function main(ns) {
 	while(botrunning) {
 		try {
 			//receive the task via ports
-			let task = await ns.readPort(TaskPort);
+			let task;
 			//receive the target via ports
-			let target = await ns.readPort(TargetPort);
+			let target;
+			for(let i = 0; i < TaskPort.length; i++) {
+				let peektask = await ns.peek(TaskPort[i]);
+				let peektarget = await ns.peek(TargetPort[i]);
+				if(peektask != "NULL PORT DATA" && peektarget != "NULL PORT DATA") {
+					task = await ns.readPort(TaskPort[i]);
+					target = await ns.readPort(TargetPort[i]);
+					break;
+				}
+			}
 			if(task != "NULL PORT DATA" && target != "NULL PORT DATA") {
 				//calculate the maximum and used ram
 				let hostmaxram = ns.getServerMaxRam(ns.getHostname());
@@ -53,6 +62,9 @@ export async function main(ns) {
 								else {
 									threadlimit = threadstouse;
 								}
+								break;
+							case "hack":
+								threadlimit = Math.ceil(threadstouse / BotMaxHacksPerTarget);
 								break;
 							default:
 								threadlimit = threadstouse;
