@@ -97,10 +97,10 @@ export async function main(ns) {
 					}, false);
 					//append the menu item to the sidebar
 					sidebar.appendChild(menuitem);
+					ns.toast("menu item " + itemname + " added", "success", 5000);
 				}
 				//show the menu item, therefore run the loop
 				itemshow = true;
-				ns.toast("menu item " + itemname + " added", "success", 5000);
 			}
 			await ns.asleep(1000);
 		}
