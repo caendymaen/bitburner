@@ -2,6 +2,65 @@
 This is all work in progress, only a few of my scripts will be deployed.
 They are also just going to be deployed, if I think, that they are finished.
 
+# const.js
+>**RAM usage:** *1.60 GB*
+
+This script just has a few constants defined, which are needed in some scripts
+
+
+# weaken.js
+>**RAM usage:** *1.80 GB*
+
+Simple weaken script with a hostname as argument
+
+
+# grow.js
+>**RAM usage:** *1.80 GB*
+
+Simple grow script with a hostname as argument
+
+
+# hack.js
+>**RAM usage:** *1.75 GB*
+
+Simple hack script with a hostname as argument
+
+
+# utils.js
+>**RAM usage:** *11.95 GB*
+
+This script defines 2 classes
+
+**PlayerDetails**: defines some basic information like how many .exe-files are available at the moment
+
+**ServerList**: collects all servers and collects some details about them
+
+
+# bot.js
+>**RAM usage:** *5.75 GB*
+
+This script is meant to be deployed on all server except home
+
+It listens to ports to get their action (weaken, grow, hack) to call the action for a specific target
+
+
+# watcher.js
+>**RAM usage:** *15.95 GB*
+
+This script coordinates the bot.js activities
+
+It runs through the list of servers deploys deployable scripts, runs the bot.js and prioritizes weaken tasks, then grow and hack
+Hacks are sorted by the target's efficiency (money/s per hack)
+If both priorities from above don't result in anything, just perform some weaken and hack (for gaining exp)
+
+
+# serverpurchase.js
+>**RAM usage:** *13.45 GB*
+
+This script runs through purchased servers (as long as the maximum amount of purchasable servers isn't reached)
+runs the bot.js on them and also upgrades them if possible
+
+
 # sidebar.js
 >**RAM usage:** *28.20 GB*
 
