@@ -480,10 +480,10 @@ async function callServers() {
 			infoBlock.innerHTML = "required ports: " + rootservers.serverList[i].requiredports + "\
 								<br />required hacking level: " + rootservers.serverList[i].requiredhacking + "\
 								<br />max ram: " + rootservers.serverList[i].maxram + "\
-								<br />security level: " + rootservers.serverList[i].securitylevel + "\
-								<br />min security level: " + ns_.getServerMinSecurityLevel(rootservers.serverList[i].servername) + "\
-								<br />available money: " + ns_.getServerMoneyAvailable(rootservers.serverList[i].servername) + "\
-								<br />maximum money: " + ns_.getServerMaxMoney(rootservers.serverList[i].servername) + "\
+								<br />security level: " + rootservers.serverList[i].securitylevel.toFixed(2) + "\
+								<br />min security level: " + ns_.getServerMinSecurityLevel(rootservers.serverList[i].servername).toFixed(2) + "\
+								<br />available money: " + ns_.getServerMoneyAvailable(rootservers.serverList[i].servername).toFixed(2) + " $\
+								<br />maximum money: " + ns_.getServerMaxMoney(rootservers.serverList[i].servername).toFixed(2) + " $\
 								<br />hack efficiency: " + rootservers.serverList[i].efficiency + " $/s";
 			//append the additional server info to the list item
 			liBlock.appendChild(infoBlock);
@@ -586,7 +586,8 @@ async function callWatcher() {
 			let scriptincome = ns_.getScriptIncome("bot.js", server.servername, (GeneralDelay * BotDelayMultiplier));
 			watcherincome += scriptincome;
 			liBlock.innerHTML = '<span class="goodcolor">' + server.servername + '</span>\
-								<br /><br />bot.js income: <span class="neutralcolor">' + new Intl.NumberFormat("en-us").format(scriptincome.toFixed(2)) + ' $/s</span>';
+								<br /><br />bot.js income: <span class="neutralcolor">' + new Intl.NumberFormat("en-us").format(scriptincome.toFixed(2)) + ' $/s</span>\
+								<br /><br />server utilization: ' + (100 * ns_.getServerUsedRam(server.servername) / ns_.getServerMaxRam(server.servername)).toFixed(2) + ' %';
 			ulBlock.appendChild(liBlock);
 		}
 	}
@@ -602,7 +603,8 @@ async function callWatcher() {
 			let scriptincome = ns_.getScriptIncome("bot.js", servername, (GeneralDelay * BotDelayMultiplier));
 			watcherincome += scriptincome;
 			liBlock.innerHTML = '<span class="goodcolor">' + servername + '</span>\
-								<br /><br />bot.js income: <span class="neutralcolor">' + new Intl.NumberFormat("en-us").format(scriptincome.toFixed(2)) + ' $/s</span>';
+								<br /><br />bot.js income: <span class="neutralcolor">' + new Intl.NumberFormat("en-us").format(scriptincome.toFixed(2)) + ' $/s</span>\
+								<br /><br />server utilization: ' + (100 * ns_.getServerUsedRam(servername) / ns_.getServerMaxRam(servername)).toFixed(2) + ' %';
 			ulBlock.appendChild(liBlock);
 		}
 	}
