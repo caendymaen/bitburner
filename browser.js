@@ -21,6 +21,8 @@ var content;
 //menulist items are defined by categories
 //within those categories there is a list of items with a name and a function to call
 var menulist;
+//define a variable to track the current visited page
+var currentpage;
 
 /** 
  * @param {NS} _ns 
@@ -86,6 +88,8 @@ export async function main(ns) {
 			]
 		}
 	];
+	//set the current page to home
+	currentpage = "home";
 	if(debug_) {
 		await ns_.tprint("starting " + ns_.getScriptName());
 	}
@@ -270,6 +274,8 @@ async function callTemplate() {
 	if(debug_) {
 		await ns_.tprint("showing template");
 	}
+	//set the current page
+	currentpage = "template";
 	//reset the content window's content
 	content.innerHTML = "";
 	//create a content's title and place it
@@ -296,6 +302,8 @@ async function callHome() {
 	if(debug_) {
 		await ns_.tprint("showing home");
 	}
+	//set the current page
+	currentpage = "home";
 	//reset the content window's content
 	content.innerHTML = "";
 	content.innerHTML = "<center><h1>Welcome to <span style='color: #00cc00;'>bitBrowser</span>!</h1></center>";
@@ -308,6 +316,8 @@ async function callHacknet() {
 	if(debug_) {
 		await ns_.tprint("showing hacknet nodes");
 	}
+	//set the current page
+	currentpage = "hacknet";
 	//set the name of the script for buying/upgrading hacknet nodes
 	let hacknetnodescript = "hacknet-buy.js";
 	//reset the content window's content
@@ -346,6 +356,8 @@ async function callRootAll() {
 	if(debug_) {
 		await ns_.tprint("showing root all");
 	}
+	//set the current page
+	currentpage = "rootall";
 	//create a new object from RootServers
 	let rootservers = new RootServers(ns_);
 	//reset the content window's content
@@ -371,6 +383,8 @@ async function callServers() {
 	if(debug_) {
 		await ns_.tprint("showing servers");
 	}
+	//set the current page
+	currentpage = "serverlist";
 	//create a new object from RootServers
 	let rootservers = new RootServers(ns_);
 	//reset the content window's content
@@ -526,6 +540,8 @@ async function callWatcher() {
 	if(debug_) {
 		await ns_.tprint("showing watcher");
 	}
+	//set the current page
+	currentpage = "watcher";
 	//reset the content window's content
 	content.innerHTML = "";
 	//create a content's title and place it
@@ -592,9 +608,14 @@ async function callWatcher() {
 	}
 	let infoblock = document.createElement("div");
 	infoblock.classList.add("serverinfo");
-	infoblock.innerHTML = '<b>total watcher income: </b><span class="neutralcolor">' + new Intl.NumberFormat("en-us").format(watcherincome) + ' $/s</span>';
+	infoblock.innerHTML = '<br />watcher.js income: <span class="neutralcolor">' + new Intl.NumberFormat("en-us").format(watcherincome) + ' $/s</span><br /><br />';
 	content.appendChild(infoblock);
 	content.appendChild(ulBlock);
+	//generally wait a little bit, then, if the current page is still watcher do a reload
+	await ns_.asleep(1000);
+	if(currentpage == "watcher") {
+		await callWatcher();
+	}
 }
 
 /**
