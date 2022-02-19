@@ -32,74 +32,76 @@ export async function main(ns) {
 				break;
 		}
 		//define a variable for letting the item show up (important to keep the onclick function work)
-		let itemshow = false;
+		let itemshow = true;
 		//set the new menu items id
 		let itemid = "menu-item-" + itemname;
 		//check, if there is already a menu item with this id
 		if(document.getElementById(itemid)) {
 			//delete the menu item
 			document.getElementById(itemid).remove();
-			//do not show anything, therefore don't run the loop
-			itemshow = false;
-		}
-		//if there is no menu item with this id
-		else {
-			//create the new menu item
-			let menuitem = document.createElement("div");
-			menuitem.id = itemid;
-			//create a ruler - add all the CSS classes used by Bitburner for correct formatting
-			let menuitemHR = document.createElement("hr");
-			menuitemHR.classList.add("MuiDivider-root");
-			menuitemHR.classList.add("MuiDivider-fullWidth");
-			menuitemHR.classList.add("css-8dakje");
-			//create the actual menu item - add all the CSS classes used by Bitburner for correct formatting
-			let menuitemDIV = document.createElement("div");
-			menuitemDIV.classList.add("MuiButtonBase-root");
-			menuitemDIV.classList.add("MuiListItem-root");
-			menuitemDIV.classList.add("MuiListItem-gutters");
-			menuitemDIV.classList.add("MuiListItem-padding");
-			menuitemDIV.classList.add("MuiListItem-button");
-			menuitemDIV.classList.add("css-1e1vz9s");
-			//create the container for the icon - add all the CSS classes used by Bitburner for correct formatting
-			let menuitemIcon = document.createElement("div");
-			menuitemIcon.classList.add("MuiListItemIcon-root");
-			menuitemIcon.classList.add("css-1f8bwsm");
-			menuitemIcon.innerHTML = itemicon;
-			//create the container for the item name - add all the CSS classes used by Bitburner for correct formatting
-			let menuitemName = document.createElement("div");
-			menuitemName.classList.add("MuiListItemText-root");
-			menuitemName.classList.add("css-1tsvksn");
-			menuitemName.classList.add("MuiTypography-root");
-			menuitemName.classList.add("MuiTypography-body1");
-			menuitemName.classList.add("css-11wufc6");
-			menuitemName.innerHTML = '<span style="color: ' + itemcolor + '; text-transform: capitalize;">' + itemname + '</span>';
-			//apend icon and name to the actual menu item
-			menuitemDIV.appendChild(menuitemIcon);
-			menuitemDIV.appendChild(menuitemName);
-			//get the list of sidebar menu items
-			let sidebar = document.querySelector(".MuiList-root");
-			//append the ruler to the menu item
-			menuitem.appendChild(menuitemHR);
-			//append the actual menu item
-			menuitem.appendChild(menuitemDIV);
-			//add functionallity to open the given script
-			menuitem.addEventListener("click", async function() {
-				//if the script to call is already running, just show a warning
-				if(await ns.isRunning(itemscript, ns.getHostname())) {
-					await ns.toast(itemscript + " is already running", "warning", 5000);
-				}
-				else {
-					await ns.exec(itemscript, ns.getHostname());
-				}
-			}, false);
-			//append the menu item to the sidebar
-			sidebar.appendChild(menuitem);
-			//show the menu item, therefore run the loop
-			itemshow = true;
-			ns.toast("menu item " + itemname + " added", "success", 5000);
 		}
 		//run as long as the menu item needs to be shown
 		while(itemshow) {
+			//if the menu item does not exist, create it
+			if(!document.getElementById(itemid)) {
+				//get the list of sidebar menu items
+				let sidebar = document.querySelector(".MuiList-root");
+				//only try to add, if the sidebar actually exists, check this every time
+				//to prevent errors, because the sidebar isn't visible 
+				if(sidebar) {
+					//create the new menu item
+					let menuitem = document.createElement("div");
+					menuitem.id = itemid;
+					//create a ruler - add all the CSS classes used by Bitburner for correct formatting
+					let menuitemHR = document.createElement("hr");
+					menuitemHR.classList.add("MuiDivider-root");
+					menuitemHR.classList.add("MuiDivider-fullWidth");
+					menuitemHR.classList.add("css-8dakje");
+					//create the actual menu item - add all the CSS classes used by Bitburner for correct formatting
+					let menuitemDIV = document.createElement("div");
+					menuitemDIV.classList.add("MuiButtonBase-root");
+					menuitemDIV.classList.add("MuiListItem-root");
+					menuitemDIV.classList.add("MuiListItem-gutters");
+					menuitemDIV.classList.add("MuiListItem-padding");
+					menuitemDIV.classList.add("MuiListItem-button");
+					menuitemDIV.classList.add("css-1e1vz9s");
+					//create the container for the icon - add all the CSS classes used by Bitburner for correct formatting
+					let menuitemIcon = document.createElement("div");
+					menuitemIcon.classList.add("MuiListItemIcon-root");
+					menuitemIcon.classList.add("css-1f8bwsm");
+					menuitemIcon.innerHTML = itemicon;
+					//create the container for the item name - add all the CSS classes used by Bitburner for correct formatting
+					let menuitemName = document.createElement("div");
+					menuitemName.classList.add("MuiListItemText-root");
+					menuitemName.classList.add("css-1tsvksn");
+					menuitemName.classList.add("MuiTypography-root");
+					menuitemName.classList.add("MuiTypography-body1");
+					menuitemName.classList.add("css-11wufc6");
+					menuitemName.innerHTML = '<span style="color: ' + itemcolor + '; text-transform: capitalize;">' + itemname + '</span>';
+					//apend icon and name to the actual menu item
+					menuitemDIV.appendChild(menuitemIcon);
+					menuitemDIV.appendChild(menuitemName);
+					//append the ruler to the menu item
+					menuitem.appendChild(menuitemHR);
+					//append the actual menu item
+					menuitem.appendChild(menuitemDIV);
+					//add functionallity to open the given script
+					menuitem.addEventListener("click", async function() {
+						//if the script to call is already running, just show a warning
+						if(await ns.isRunning(itemscript, ns.getHostname())) {
+							await ns.toast(itemscript + " is already running", "warning", 5000);
+						}
+						else {
+							await ns.exec(itemscript, ns.getHostname());
+						}
+					}, false);
+					//append the menu item to the sidebar
+					sidebar.appendChild(menuitem);
+				}
+				//show the menu item, therefore run the loop
+				itemshow = true;
+				ns.toast("menu item " + itemname + " added", "success", 5000);
+			}
 			await ns.asleep(1000);
 		}
 		//delete the menuitem
