@@ -74,3 +74,16 @@ This script lets you add new items to the sidebar menu.
 
 This script contains a function to make a HTML element draggable
 it needs a container which is the one where the functionallity should have an effect and the actual draggable container
+
+
+# browser.js
+>**RAM usage:** *X.XX GB*
+
+This script is by far not finished yet, but works with the current functions
+
+
+# startup.js
+>**RAM usage:** *5.15 GB*
+
+This script runs as long a script for buying hacknets is not running, watcher.js is not running and browser.js wasn't added to the sidebar
+So this just starts some "main" scripts
