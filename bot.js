@@ -16,6 +16,7 @@ export async function main(ns) {
 			let task;
 			//receive the target via ports
 			let target;
+			//check TaskPort + its backups
 			for(let i = 0; i < TaskPort.length; i++) {
 				let peektask = await ns.peek(TaskPort[i]);
 				let peektarget = await ns.peek(TargetPort[i]);
