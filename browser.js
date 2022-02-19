@@ -393,6 +393,17 @@ async function callServers() {
 	let title = document.createElement("h1");
 	title.innerHTML = "ServerList";
 	content.appendChild(title);
+	let searchbar = document.createElement("input");
+	searchbar.id = "serversearch";
+	searchbar.placeholder = "search..."
+	searchbar.type = "search";
+	searchbar.addEventListener("keyup", function() {
+		let searchitem = document.getElementById("li-" + searchbar.value);
+		if(searchitem) {
+			searchitem.scrollIntoView();
+		}
+	}, false);
+	content.appendChild(searchbar);
 	//create an array of list items, which is inspected later
 	//to make the server-tree work
 	let liItems = [];
@@ -418,11 +429,7 @@ async function callServers() {
 			//create a button to expand the tree
 			let expandbutton = document.createElement("div");
 			expandbutton.className = "expandbutton";
-			expandbutton.innerHTML = "&#11208;"
-			//home isn't hidden at first, therefore give it's expand button another icon
-			if(rootservers.serverList[i].servername == "home") {
-				expandbutton.innerHTML = "&#11206;"
-			}
+			expandbutton.innerHTML = "&#11206;"
 			//add functionallity to expand a tree node
 			expandbutton.addEventListener("click", function(e) {
 				//get the parent element of the expand button (list item)
@@ -521,7 +528,7 @@ async function callServers() {
 				//if the server's parent is not home, hide the inside children at first (toggling CSS class hideIt)
 				if(rootservers.serverList[i].parent != "home") {
 					tmpUl.classList.add("serverblock");
-					tmpUl.classList.toggle("hideIt");
+					//tmpUl.classList.toggle("hideIt");
 				}
 				//append the list item to this new list
 				tmpUl.appendChild(liBlock);
@@ -610,7 +617,7 @@ async function callWatcher() {
 	}
 	let infoblock = document.createElement("div");
 	infoblock.classList.add("serverinfo");
-	infoblock.innerHTML = '<br />watcher.js income: <span class="neutralcolor">' + new Intl.NumberFormat("en-us").format(watcherincome) + ' $/s</span><br /><br />';
+	infoblock.innerHTML = '<br />watcher.js income: <span class="neutralcolor">' + new Intl.NumberFormat("en-us").format(watcherincome.toFixed(2)) + ' $/s</span><br /><br />';
 	content.appendChild(infoblock);
 	content.appendChild(ulBlock);
 	//generally wait a little bit, then, if the current page is still watcher do a reload
