@@ -116,7 +116,7 @@ async function createBrowser() {
 		await ns_.tprint("shutting down " + ns_.getScriptName());
 	}
 	//some output to say, that the browser is shutting down
-	ns_.toast("shutting down " + ns_.getScriptName(), "error", 5000);
+	ns_.toast("closing " + ns_.getScriptName(), "error", 5000);
 	if(document.getElementById('bitBrowser')) {
 		document.getElementById('bitBrowser').remove();
 	}
@@ -233,7 +233,7 @@ async function populateMenu(menu) {
 				try {
 					e.preventDefault();
 					if(debug_) {
-						await ns_.toast("testing menu item " + menulist[i].items[j].itemname + " click", "warning", 5000); //<---does not work here!! <--- SLEEP is running!!!!!!!!! <---- ns.asleep(ms) works instead!
+						await ns_.tprint("testing menu item " + menulist[i].items[j].itemname + " click");
 					}
 					//search, if there already is a clicked list item
 					let oldActiveItem = document.getElementById('activeItem');
@@ -266,7 +266,7 @@ async function populateMenu(menu) {
 
 async function callTemplate() {
 	if(debug_) {
-		await ns_.toast("showing template", "warning", 5000);
+		await ns_.tprint("showing template");
 	}
 	//reset the content window's content
 	content.innerHTML = "";
@@ -292,7 +292,7 @@ async function callTemplate() {
  */
 async function callHome() {
 	if(debug_) {
-		await ns_.toast("showing home", "warning", 5000);
+		await ns_.tprint("showing home");
 	}
 	//reset the content window's content
 	content.innerHTML = "";
@@ -304,7 +304,7 @@ async function callHome() {
  */
 async function callHacknet() {
 	if(debug_) {
-		await ns_.toast("showing hacknet nodes", "warning", 5000);
+		await ns_.tprint("showing hacknet nodes");
 	}
 	//set the name of the script for buying/upgrading hacknet nodes
 	let hacknetnodescript = "hacknet-buy.js";
@@ -342,7 +342,7 @@ async function callHacknet() {
  */
 async function callRootAll() {
 	if(debug_) {
-		await ns_.toast("showing root all", "warning", 5000);
+		await ns_.tprint("showing root all");
 	}
 	//create a new object from RootServers
 	let rootservers = new RootServers(ns_);
@@ -367,7 +367,7 @@ async function callRootAll() {
  */
 async function callServers() {
 	if(debug_) {
-		await ns_.toast("showing servers", "warning", 5000);
+		await ns_.tprint("showing servers");
 	}
 	//create a new object from RootServers
 	let rootservers = new RootServers(ns_);
