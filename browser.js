@@ -4,6 +4,8 @@ import {getBrowserCSS} from "css.js"
 import {makeDraggable} from "dragndrop.js"
 //import hacking script
 import {RootServers} from "root.js"
+//import constants
+import {GeneralDelay, BotDelayMultiplier} from "const.js"
 
 //global variable for the netscript object
 var ns_;
@@ -71,7 +73,7 @@ export async function main(ns) {
 				},
 				{
 					itemname: "Watcher",
-					itemfunction: "callTemplate()",
+					itemfunction: "callWatcher()",
 					icon: '<path fill-rule="evenodd" clip-rule="evenodd" d="M16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12ZM14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z" fill="currentColor" /> <path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C17.5915 3 22.2898 6.82432 23.6219 12C22.2898 17.1757 17.5915 21 12 21C6.40848 21 1.71018 17.1757 0.378052 12C1.71018 6.82432 6.40848 3 12 3ZM12 19C7.52443 19 3.73132 16.0581 2.45723 12C3.73132 7.94186 7.52443 5 12 5C16.4756 5 20.2687 7.94186 21.5428 12C20.2687 16.0581 16.4756 19 12 19Z" fill="currentColor" />',
 					iconVB: "0 0 24 24"
 				},
@@ -427,35 +429,14 @@ async function callServers() {
 			}, false);
 			//append the expand button to the list item
 			liBlock.appendChild(expandbutton);
+			
 		}
 		//check, if the current servername is not "home"
 		if(rootservers.serverList[i].servername != "home") {
 			//check if the current server has rootaccess
 			if(rootservers.serverList[i].rootaccess) {
 				//format the servername to green
-				innerBlock.classList.add("goodcolor");
-				//create an element for a weakening-button
-				let weakbutton = document.createElement("div");
-				weakbutton.className = "genericbutton";
-				weakbutton.innerHTML = "weaken it!"
-				//add functionallity to weaken a server
-				weakbutton.addEventListener("click", function() {
-					ns_.toast("success", "success");
-					ns_.toast("info", "info");
-					ns_.toast("warning", "warning");
-					ns_.toast("error", "error");
-					/**
-					 * ---------------------------------------
-					 * ---------------------------------------
-					 * ---------------------------------------
-					 * TODO: weaken it functionallity!!!!!!!!!
-					 * ---------------------------------------
-					 * ---------------------------------------
-					 * ---------------------------------------
-					 */
-					callServers();
-				}, false);
-				liBlock.appendChild(weakbutton);			
+				innerBlock.classList.add("goodcolor");		
 			} 
 			//if there is no rootaccess to the current server
 			else {
@@ -525,6 +506,7 @@ async function callServers() {
 				let tmpUl = document.createElement("ul");
 				//if the server's parent is not home, hide the inside children at first (toggling CSS class hideIt)
 				if(rootservers.serverList[i].parent != "home") {
+					tmpUl.classList.add("serverblock");
 					tmpUl.classList.toggle("hideIt");
 				}
 				//append the list item to this new list
@@ -537,6 +519,81 @@ async function callServers() {
 		liItems.push(liBlock);
 	}
 	//add the whole serverlist to the content window
+	content.appendChild(ulBlock);
+}
+
+async function callWatcher() {
+	if(debug_) {
+		await ns_.tprint("showing watcher");
+	}
+	//reset the content window's content
+	content.innerHTML = "";
+	//create a content's title and place it
+	let title = document.createElement("h1");
+	title.innerHTML = "Watcher";
+	content.appendChild(title);
+	//create a button to start/stop the watcher
+	let watcherbutton = document.createElement("div");
+	let watcherscript = "watcher.js";
+	let watcherincome = 0;
+	//check if the hacknet-buy script is running
+	if(await ns_.isRunning(watcherscript, "home")) {
+		watcherbutton.className = "buttonbad";
+		watcherbutton.innerHTML = "stop watcher.js";
+		watcherbutton.addEventListener("click", async function() {
+			await ns_.kill(watcherscript, "home");
+			await ns_.toast("killed " + watcherscript, "error", 5000);
+			await callWatcher();
+		}, false);
+	}
+	else {
+		watcherbutton.className = "buttongood";
+		watcherbutton.innerHTML = "start watcher.js";
+		watcherbutton.addEventListener("click", async function() {
+			await ns_.exec(watcherscript, "home"); //
+			await ns_.toast("started " + watcherscript, "success", 5000);
+			await callWatcher();
+		}, false);
+	}
+	content.appendChild(watcherbutton);
+	//create the initial list
+	let ulBlock = document.createElement("ul");
+	let servers = new RootServers(ns_);
+	//run through the list of servers
+	for(let i = 0; i < servers.serverList.length; i++) {
+		//get the current server
+		let server = servers.serverList[i];
+		//append a list item, if bot.js is running on the current server
+		if(ns_.isRunning("bot.js", server.servername, (GeneralDelay * BotDelayMultiplier))) {
+			//create a list item with some server information
+			let liBlock = document.createElement("li");
+			let scriptincome = ns_.getScriptIncome("bot.js", server.servername, (GeneralDelay * BotDelayMultiplier));
+			watcherincome += scriptincome;
+			liBlock.innerHTML = '<span class="goodcolor">' + server.servername + '</span>\
+								<br /><br />bot.js income: <span class="neutralcolor">' + new Intl.NumberFormat("en-us").format(scriptincome.toFixed(2)) + ' $/s</span>';
+			ulBlock.appendChild(liBlock);
+		}
+	}
+	servers = ns_.getPurchasedServers();
+	//run through the list of servers
+	for(let i = 0; i < servers.length; i++) {
+		//get the current server
+		let servername = servers[i];
+		//append a list item, if bot.js is running on the current server
+		if(ns_.isRunning("bot.js", servername, (GeneralDelay * BotDelayMultiplier))) {
+			//create a list item with some server information
+			let liBlock = document.createElement("li");
+			let scriptincome = ns_.getScriptIncome("bot.js", servername, (GeneralDelay * BotDelayMultiplier));
+			watcherincome += scriptincome;
+			liBlock.innerHTML = '<span class="goodcolor">' + servername + '</span>\
+								<br /><br />bot.js income: <span class="neutralcolor">' + new Intl.NumberFormat("en-us").format(scriptincome.toFixed(2)) + ' $/s</span>';
+			ulBlock.appendChild(liBlock);
+		}
+	}
+	let infoblock = document.createElement("div");
+	infoblock.classList.add("serverinfo");
+	infoblock.innerHTML = '<b>total watcher income: </b><span class="neutralcolor">' + new Intl.NumberFormat("en-us").format(watcherincome) + ' $/s</span>';
+	content.appendChild(infoblock);
 	content.appendChild(ulBlock);
 }
 
