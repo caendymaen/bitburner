@@ -42,10 +42,12 @@ export async function main(ns) {
 			//define a variable for ram cost of bot.js and any additional script (weaken.js, grow.js, hack.js)
 			let botram = ns.getScriptRam("bot.js") + ns.getScriptRam("weaken.js");
 			//recalculate the needed ram to the next power of 2
-			botram = Math.pow(2,Math.floor(Math.log(botram)/Math.log(2)));
+			botram = Math.pow(2,Math.ceil(Math.log(botram)/Math.log(2)));
 			//if there is enough money to buy a server, do so
 			if(ns.getServerMoneyAvailable("home") > ns.getPurchasedServerCost(botram)) {
 				await ns.purchaseServer("serv-" + servers.length, botram);
+				//after purchasing a server, reload the list of purchased servers
+				servers = ns.getPurchasedServers();
 				//run through the list of servers
 				for(let i = 0; i < servers.length; i++) {
 					//get the current server
