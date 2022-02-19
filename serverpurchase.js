@@ -1,8 +1,8 @@
-import {DeployableScripts} from "const.js"
+import {DeployableScripts, GeneralDelay, BotDelayMultiplier} from "const.js"
 /** @param {NS} ns **/
 export async function main(ns) {
 	//define a general delay for looping
-	let purchasedelay = 50;
+	let purchasedelay = GeneralDelay;
 	//define variable for running the purchasing loop
 	let purchasing = true;
 	//create the list of servers
@@ -30,7 +30,7 @@ export async function main(ns) {
 		//let it run bot.js and any additional script (weaken.js, grow.js, hack.js)
 		if(!ns.scriptRunning("bot.js", servername) && (ns.getServerMaxRam(servername) > ((ns.getScriptRam("bot.js", servername) + ns.getScriptRam("weaken.js", servername))))) {
 			//run bot.js on the server
-			ns.exec("bot.js", servername, 1, (purchasedelay * 2));
+			ns.exec("bot.js", servername, 1, (purchasedelay * BotDelayMultiplier));
 		}
 	}
 	//loop infinitely
@@ -69,7 +69,7 @@ export async function main(ns) {
 					//let it run bot.js and any additional script (weaken.js, grow.js, hack.js)
 					if(!ns.scriptRunning("bot.js", servername) && (ns.getServerMaxRam(servername) > ((ns.getScriptRam("bot.js", servername) + ns.getScriptRam("weaken.js", servername))))) {
 						//run bot.js on the server
-						ns.exec("bot.js", servername, 1, (purchasedelay * 2));
+						ns.exec("bot.js", servername, 1, (purchasedelay * BotDelayMultiplier));
 					}
 				}
 			}
@@ -108,7 +108,7 @@ export async function main(ns) {
 						//let it run bot.js and any additional script (weaken.js, grow.js, hack.js)
 						if(!ns.scriptRunning("bot.js", servername) && (ns.getServerMaxRam(servername) > ((ns.getScriptRam("bot.js", servername) + ns.getScriptRam("weaken.js", servername))))) {
 							//run bot.js on the server
-							ns.exec("bot.js", servername, 1, (purchasedelay * 2));
+							ns.exec("bot.js", servername, 1, (purchasedelay * BotDelayMultiplier));
 						}
 					}
 				}
