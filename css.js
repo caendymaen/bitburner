@@ -28,6 +28,7 @@ export async function getBrowserCSS() {
 			max-height: 1200px;\
 			overflow: hidden;\
 			z-index: 99999;\
+			scroll-behavior: smooth;\
 		}\
 		#bitBrowser::-webkit-resizer {\
 			border-bottom: 3px solid #00cc00;\
@@ -137,18 +138,6 @@ export async function getBrowserCSS() {
 			width: 24px;\
 			height: 24px;\
 		}\
-		#bitBrowserMenu #bitBrowserMenuWindow ul li svg path, #bitBrowserMenu #bitBrowserMenuWindow ul li svg polygon, #bitBrowserMenu #bitBrowserMenuWindow ul li svg rect  {\
-			fill: #888888;\
-		}\
-		#bitBrowserMenu #bitBrowserMenuWindow ul li svg circle  {\
-			stroke: #888888;\
-		}\
-		#bitBrowserMenu #bitBrowserMenuWindow ul li svg#activeicon path, #bitBrowserMenu #bitBrowserMenuWindow ul li svg#activeicon polygon, #bitBrowserMenu #bitBrowserMenuWindow ul li svg#activeicon rect  {\
-			fill: #00cc00;\
-		}\
-		#bitBrowserMenu #bitBrowserMenuWindow ul li svg#activeicon circle  {\
-			stroke: #00cc00;\
-		}\
 		\
 		.buttongood {\
 			border: 1px solid #444444;\
@@ -224,6 +213,7 @@ export async function getBrowserCSS() {
 			display: none;\
 		}\
 		.serverinfoname {\
+			font-family: Lucida Console, Lucida Sans Unicode, Fira Mono, Consolas, Courier New, monospace;\
 			font-size: 16px;\
 			text-align: left;\
 		}\
@@ -238,6 +228,9 @@ export async function getBrowserCSS() {
 		}\
 		.standardcolor {\
 			color: #888888;\
+		}\
+		.passivecolor {\
+			color: #44b2bc;\
 		}\
 		.serverblock{}\
 		#serversearch {\
