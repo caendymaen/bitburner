@@ -27,7 +27,7 @@ Simple hack script with a hostname as argument
 
 
 # utils.js
->**RAM usage:** *11.95 GB*
+>**RAM usage:** *16.95 GB*
 
 This script defines 2 classes
 
@@ -37,13 +37,13 @@ This script defines 2 classes
 
 
 # root.js
->**RAM usage:** *12.00 GB*
+>**RAM usage:** *17.00 GB*
 
 This script defines a class with functionallity to root one or all servers
 
 
 # bot.js
->**RAM usage:** *5.75 GB*
+>**RAM usage:** *3.35 GB*
 
 This script is meant to be deployed on all server except home
 
@@ -51,7 +51,7 @@ It listens to ports to get their action (weaken, grow, hack) to call the action 
 
 
 # watcher.js
->**RAM usage:** *15.95 GB*
+>**RAM usage:** *16.95 GB*
 
 This script coordinates the bot.js activities
 
@@ -61,7 +61,7 @@ If both priorities from above don't result in anything, just perform some weaken
 
 
 # serverpurchase.js
->**RAM usage:** *13.45 GB*
+>**RAM usage:** *22.30 GB*
 
 This script runs through purchased servers (as long as the maximum amount of purchasable servers isn't reached)
 runs the bot.js on them and also upgrades them if possible
