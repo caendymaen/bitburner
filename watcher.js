@@ -1,45 +1,31 @@
-import {ServerList} from "utils.js";
-import {DeployableScripts, TaskPort, TargetPort, GeneralMultipliers, GeneralDelay, BotDelayMultiplier} from "const.js"
+import {ServerList, PortHandler, DeliveryService} from "utils.js";
+import {DeployableScripts, BotPorts, GeneralMultipliers, GeneralDelay, BotDelayMultiplier, BotScript, AttackMaxRAM} from "const.js"
 /** @param {NS} ns **/
 export async function main(ns) {
 	//define a general delay for looping/watching
 	let watchdelay = GeneralDelay;
-	//clear ports that are important for watcher<>bot communication
-	for(let i = 0; i < TaskPort.length; i++) {
-		await ns.clearPort(TaskPort[i]);
-	}
-	for(let i = 0; i < TargetPort.length; i++) {
-		await ns.clearPort(TargetPort[i]);
-	}
 	//create the list of servers
 	let servers = new ServerList(ns);
+	//create the PortHandler
+	let porthandler = new PortHandler(ns, BotPorts);
+	//create the DeliveryService
+	let deliveryservice = new DeliveryService(ns, DeployableScripts);
+	//clear ports that are important for watcher<>bot communication
+	await porthandler.clearUsedPorts();
 	//run through the list of servers
 	for(let i = 0; i < servers.serverList.length; i++) {
 		//get the current server
 		let server = servers.serverList[i];
 		//if there is root access to the server and it has more than 0 gb ram
 		if(server.rootaccess && server.maxram > 0 && server.servername != "home") {
-			//check, if deployable scripts are already on the server, if not copy them
-			for(let scriptname of DeployableScripts) {
-				//if the deployable scripts do not exist, copy them
-				if(!ns.fileExists(scriptname, server.servername)) {
-					await ns.scp(scriptname, server.servername);
-				}
-				else {
-					//if the deployable scripts are not running at the moment 
-					//remove them and copy them again (in case there were updates done on the home server)
-					if(!ns.scriptRunning(scriptname, server.servername)) {
-						ns.rm(scriptname, server.servername);
-						await ns.scp(scriptname, server.servername);
-					}
-				}
-			}
-			//check, if bot.js is not running on the server AND the server's max ram
-			//let it run bot.js and any additional script (weaken.js, grow.js, hack.js)
-			if(!ns.scriptRunning("bot.js", server.servername) && (server.maxram > ((ns.getScriptRam("bot.js", server.servername) + ns.getScriptRam("weaken.js", server.servername))))) {
-				//run bot.js on the server
-				ns.exec("bot.js", server.servername, 1, (watchdelay * BotDelayMultiplier));
-			}
+			//redeploy the scripts and run the botscript if possible
+			let deliverysettings = {
+				replace: true,
+				runscript: BotScript,
+				runbuffer: AttackMaxRAM,
+				rundelay: (watchdelay * BotDelayMultiplier)
+			};
+			await deliveryservice.deployScripts(server.servername, deliverysettings);
 		}
 	}
 	//loop infinitely
@@ -54,45 +40,44 @@ export async function main(ns) {
 			let server = servers.serverList[i];
 			//if there is root access to the server and it has more than 0 gb ram
 			if(server.rootaccess && server.maxram > 0 && server.servername != "home") {
-				//check, if deployable scripts are already on the server, if not copy them
-				for(let scriptname of DeployableScripts) {
-					//if the deployable scripts do not exist, copy them
-					if(!ns.fileExists(scriptname, server.servername)) {
-						await ns.scp(scriptname, server.servername);
-					}
-					else {
-					}
-				}
-				//check, if bot.js is not running on the server AND the server's max ram
-				//let it run bot.js and any additional script (weaken.js, grow.js, hack.js)
-				if(!ns.scriptRunning("bot.js", server.servername) && (server.maxram > ((ns.getScriptRam("bot.js", server.servername) + ns.getScriptRam("weaken.js", server.servername))))) {
-					//run bot.js on the server
-					ns.exec("bot.js", server.servername, 1, (watchdelay * BotDelayMultiplier));
-				}
+				//deploy the scripts, if not existing and run the botscript
+				let deliverysettings = {
+					replace: false,
+					runscript: BotScript,
+					runbuffer: AttackMaxRAM,
+					rundelay: (watchdelay * BotDelayMultiplier)
+				};
+				await deliveryservice.deployScripts(server.servername, deliverysettings);
 			}
 			//if there is root access to the server and it has more than 0 gb ram and sever is hackable create the strategy
 			if(server.rootaccess && server.ishackable && server.servername != "home") {
 				//if the server's security level is equal or bigger than its base security level, try to queue
 				if(server.securitylevel > (ns.getServerMinSecurityLevel(server.servername) * GeneralMultipliers.minServerSecurity)) {
-					//check TaskPort + its backups
-					for(let i = 0; i < TaskPort.length; i++) {
-						let twptask = await ns.tryWritePort(TaskPort[i], "weaken");
-						let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
-						if(twptask && twptarget) {
-							break;
-						}
+					//define a variable for threads to use at best case
+					let threadstouse = 1;
+					//calculate the difference in security level from current to minimum
+					let securityleveltoreduce = server.securitylevel - (ns.getServerMinSecurityLevel(server.servername) * GeneralMultipliers.minServerSecurity);
+					//calculate the amount of weaken() to reduce the security level to a minimum
+					if(ns.weakenAnalyze(1) > 0 && securityleveltoreduce > 0) {
+						threadstouse = Math.ceil(securityleveltoreduce / ns.weakenAnalyze(1));
 					}
+					await porthandler.tryPortWriteTask("weaken", server.servername, threadstouse);
 				}
 				//if min security level was reached and max money not, grow
 				else if(ns.getServerMoneyAvailable(server.servername) < (ns.getServerMaxMoney(server.servername) * GeneralMultipliers.maxServerMoney)) {
-					//check TaskPort + its backups
-					for(let i = 0; i < TaskPort.length; i++) {
-						let twptask = await ns.tryWritePort(TaskPort[i], "grow");
-						let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
-						if(twptask && twptarget) {
-							break;
-						}
+					//define a variable for threads to use at best case
+					let threadstouse = 1;
+					//get max and available money
+					let maxmoney = ns.getServerMaxMoney(server.servername) * GeneralMultipliers.maxServerMoney;
+					let availablemoney = ns.getServerMoneyAvailable(server.servername);
+					//do some additional checks to know that really everything is fine with the money values
+					if(maxmoney > 0 && availablemoney > 0 && maxmoney > availablemoney) {
+						//calculate the multiplier to grow the money to max
+						let multipliermoney = maxmoney / availablemoney;
+						//calculate the amount of threads to use to grow to max
+						threadstouse = Math.ceil(ns.growthAnalyze(server.servername, multipliermoney));
 					}
+					await porthandler.tryPortWriteTask("grow", server.servername, threadstouse);
 				}
 				//if security level is at minimum and money is at maximum add the server to the hackable servers
 				else {
@@ -112,14 +97,9 @@ export async function main(ns) {
 			for(let i = 0; i < hackableservers.length; i++) {
 				//the efficiency sorted servers are tried to get hacked one after another
 				let server = hackableservers[i];
-				//check TaskPort + its backups
-				for(let i = 0; i < TaskPort.length; i++) {
-					let twptask = await ns.tryWritePort(TaskPort[i], "hack");
-					let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
-					if(twptask && twptarget) {
-						break;
-					}
-				}
+				//threads to use for hack is 0, because bot will calculate the amount of threads when 0 by himself
+				let threadstouse = 0;
+				await porthandler.tryPortWriteTask("hack", server.servername, threadstouse);
 			}
 		}
 		//if there are no hackable servers
@@ -132,25 +112,21 @@ export async function main(ns) {
 				if(server.rootaccess && server.ishackable && server.maxram > 0 && server.servername != "home") {
 					//if minimum security level is not reached, weaken
 					if(server.securitylevel > (ns.getServerMinSecurityLevel(server.servername) * GeneralMultipliers.minServerSecurity)) {
-						//check TaskPort + its backups
-						for(let i = 0; i < TaskPort.length; i++) {
-							let twptask = await ns.tryWritePort(TaskPort[i], "weaken");
-							let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
-							if(twptask && twptarget) {
-								break;
-							}
+						//define a variable for threads to use at best case
+						let threadstouse = 1;
+						//calculate the difference in security level from current to minimum
+						let securityleveltoreduce = server.securitylevel - (ns.getServerMinSecurityLevel(server.servername) * GeneralMultipliers.minServerSecurity);
+						//calculate the amount of weaken() to reduce the security level to a minimum
+						if(ns.weakenAnalyze(1) > 0 && securityleveltoreduce > 0) {
+							threadstouse = Math.ceil(securityleveltoreduce / ns.weakenAnalyze(1));
 						}
+						await porthandler.tryPortWriteTask("weaken", server.servername, threadstouse);
 					}
 					//if minimum security level is reached, hack
 					else {
-						//check TaskPort + its backups
-						for(let i = 0; i < TaskPort.length; i++) {
-							let twptask = await ns.tryWritePort(TaskPort[i], "hack");
-							let twptarget = await ns.tryWritePort(TargetPort[i], server.servername);
-							if(twptask && twptarget) {
-								break;
-							}
-						}
+						//threads to use for hack is 0, because bot will calculate the amount of threads when 0 by himself
+						let threadstouse = 0;
+						await porthandler.tryPortWriteTask("hack", server.servername, threadstouse);
 					}
 				}
 			}
