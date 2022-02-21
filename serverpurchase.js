@@ -1,37 +1,27 @@
-import {DeployableScripts, GeneralDelay, BotDelayMultiplier} from "const.js"
+import {DeployableScripts, GeneralDelay, BotDelayMultiplier, BotScript, AttackMaxRAM} from "const.js"
+import {DeliveryService} from "utils.js";
 /** @param {NS} ns **/
 export async function main(ns) {
 	//define a general delay for looping
 	let purchasedelay = GeneralDelay;
 	//define variable for running the purchasing loop
 	let purchasing = true;
+	//create the DeliveryService
+	let deliveryservice = new DeliveryService(ns, DeployableScripts);
 	//create the list of servers
 	let servers = ns.getPurchasedServers();
 	//run through the list of servers
 	for(let i = 0; i < servers.length; i++) {
 		//get the current server
 		let servername = servers[i];
-		//check, if deployable scripts are already on the server, if not copy them
-		for(let scriptname of DeployableScripts) {
-			//if the deployable scripts do not exist, copy them
-			if(!ns.fileExists(scriptname, servername)) {
-				await ns.scp(scriptname, servername);
-			}
-			else {
-				//if the deployable scripts are not running at the moment 
-				//remove them and copy them again (in case there were updates done on the home server)
-				if(!ns.scriptRunning(scriptname, servername)) {
-					ns.rm(scriptname, servername);
-					await ns.scp(scriptname, servername);
-				}
-			}
-		}
-		//check, if bot.js is not running on the server AND the server's max ram
-		//let it run bot.js and any additional script (weaken.js, grow.js, hack.js)
-		if(!ns.scriptRunning("bot.js", servername) && (ns.getServerMaxRam(servername) > ((ns.getScriptRam("bot.js", servername) + ns.getScriptRam("weaken.js", servername))))) {
-			//run bot.js on the server
-			ns.exec("bot.js", servername, 1, (purchasedelay * BotDelayMultiplier));
-		}
+		//redeploy the scripts and run the botscript if possible
+		let deliverysettings = {
+			replace: true,
+			runscript: BotScript,
+			runbuffer: AttackMaxRAM,
+			rundelay: (purchasedelay * BotDelayMultiplier)
+		};
+		await deliveryservice.deployScripts(servername, deliverysettings);
 	}
 	//loop infinitely
 	while(purchasing) {
@@ -52,28 +42,14 @@ export async function main(ns) {
 				for(let i = 0; i < servers.length; i++) {
 					//get the current server
 					let servername = servers[i];
-					//check, if deployable scripts are already on the server, if not copy them
-					for(let scriptname of DeployableScripts) {
-						//if the deployable scripts do not exist, copy them
-						if(!ns.fileExists(scriptname, servername)) {
-							await ns.scp(scriptname, servername);
-						}
-						else {
-							//if the deployable scripts are not running at the moment 
-							//remove them and copy them again (in case there were updates done on the home server)
-							if(!ns.scriptRunning(scriptname, servername)) {
-								ns.rm(scriptname, servername);
-								await ns.scp(scriptname, servername);
-							}
-						}
-					}
-					//check, if bot.js is not running on the server AND the server's max ram
-					//let it run bot.js and any additional script (weaken.js, grow.js, hack.js)
-					if(!ns.scriptRunning("bot.js", servername) && (ns.getServerMaxRam(servername) > ((ns.getScriptRam("bot.js", servername) + ns.getScriptRam("weaken.js", servername))))) {
-						//run bot.js on the server
-						ns.exec("bot.js", servername, 1, (purchasedelay * BotDelayMultiplier));
-						await ns.toast("new server " + servername + " bought and bot.js deployed", "success", 5000);
-					}
+					//redeploy the scripts and run the botscript if possible
+					let deliverysettings = {
+						replace: true,
+						runscript: BotScript,
+						runbuffer: AttackMaxRAM,
+						rundelay: (purchasedelay * BotDelayMultiplier)
+					};
+					await deliveryservice.deployScripts(servername, deliverysettings);
 				}
 			}
 		}
@@ -92,28 +68,15 @@ export async function main(ns) {
 						await ns.killall(servername);
 						await ns.deleteServer(servername);
 						await ns.purchaseServer(servername, (serverram * 2));
-						//check, if deployable scripts are already on the server, if not copy them
-						for(let scriptname of DeployableScripts) {
-							//if the deployable scripts do not exist, copy them
-							if(!ns.fileExists(scriptname, servername)) {
-								await ns.scp(scriptname, servername);
-							}
-							else {
-								//if the deployable scripts are not running at the moment 
-								//remove them and copy them again (in case there were updates done on the home server)
-								if(!ns.scriptRunning(scriptname, servername)) {
-									ns.rm(scriptname, servername);
-									await ns.scp(scriptname, servername);
-								}
-							}
-						}
-						//check, if bot.js is not running on the server AND the server's max ram
-						//let it run bot.js and any additional script (weaken.js, grow.js, hack.js)
-						if(!ns.scriptRunning("bot.js", servername) && (ns.getServerMaxRam(servername) > ((ns.getScriptRam("bot.js", servername) + ns.getScriptRam("weaken.js", servername))))) {
-							//run bot.js on the server
-							ns.exec("bot.js", servername, 1, (purchasedelay * BotDelayMultiplier));
-							await ns.toast("upgraded server " + servername + " and deployed bot.js", "info", 5000);
-						}
+						//redeploy the scripts and run the botscript if possible
+						let deliverysettings = {
+							replace: true,
+							runscript: BotScript,
+							runbuffer: AttackMaxRAM,
+							rundelay: (purchasedelay * BotDelayMultiplier)
+						};
+						await deliveryservice.deployScripts(servername, deliverysettings);
+						await ns.toast("upgraded server " + servername + " and deployed bot.js", "info", 5000);
 					}
 				}
 				else {
