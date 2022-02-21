@@ -258,6 +258,23 @@ export class ServerList {
 		return pathToServer.reverse();
 	}
 	/**
+	 * Description:						returns a string to copy and paste it into the terminal
+	 * 
+	 * @param {string} 	servername 		name of a server, for which a path should be created
+	 * @returns {string}				returns a string with a pasteable connect path
+	 */
+	getServerPathString(servername) {
+		//define variables for path, pathstring
+		let pathToServer = this.getServerPath(servername);
+		let pathstring = "";
+		for(let i = 0; i < pathToServer.length; i++) {
+			if(pathToServer[i] != "home") {
+				pathstring += "connect " + pathToServer[i] + "; ";
+			}
+		}
+		return pathstring;
+	}
+	/**
 	 * Description:						returns an array of server names, starting from home to "servername" to get the "real" connection between the servers
 	 * 
 	 * @param {string} 	servername 		name of a server, for which a path should be created
@@ -338,5 +355,153 @@ export class ServerList {
 		}
 		//return efficiency
 		return efficiency;
+	}
+}
+/** Class representing functionallities to handle ports */
+export class PortHandler {
+	/**
+	 * Description 						create PortHandler
+	 * 
+	 * @param {NSObject} ns_ 			the Netscript object
+	 * @param {array|number} botports_ 	a number or an array which includes all ports a bot should take care of watching
+	 */
+	constructor(ns_, botports_) {
+		//set the Netscript object
+		this.ns = ns_;
+		//set the bot ports (standard 1)
+		this.botports = botports_ || 1;
+	}
+	/**
+	 * Description:						trys to write a task and target into one port as JSON
+	 * 
+	 * @Param {string} task				a task to be written into it's port(s)
+	 * @Param {string} target			a target to be written into it's port(s)
+	 */
+	async tryPortWriteTask(task_, target_, attackingthreads_) {
+		//define a variable which checks, if ports are array or not (e.g. for backup queueus)
+		let multipleports = this.botports.length;
+		let taskobject = {
+			bottask: task_,
+			bottarget: target_,
+			attackingthreads: attackingthreads_,
+			attackingid: task_.toString().substring(0, 1) + "-" + this.createID()
+		}
+		let taskJSON = JSON.stringify(taskobject);
+		//if there are multiple ports do tryWritePort() for all backup queues
+		if(multipleports > 0) {
+			//check TaskPort + its backups
+			let queue = 1;
+			for(let i = (this.botports.length - 1); i >= 0; i--) {
+				if(await this.ns.peek(this.botports[i]) == "NULL PORT DATA") {
+					queue = this.botports[i];
+				}
+			}
+			await this.ns.tryWritePort(queue, taskJSON);
+		}
+		//if there is only one port defined do a simple tryWritePort() for this port
+		else {
+			await this.ns.tryWritePort(this.botports, taskJSON);
+		}
+	}
+	/**
+	 * Description:						clears all ports, used for tasks and targets
+	 */
+	async clearUsedPorts() {
+		//define a variable which checks, if ports are array or not (e.g. for backup queueus)
+		let multipleports = this.botports.length;
+		//if there are multiple ports do tryWritePort() for all backup queues
+		if(multipleports > 0) {
+			//check TaskPort + its backups
+			for(let i = 0; i < this.botports.length; i++) {
+				await this.ns.clearPort(this.botports[i]);
+			}
+		}
+		//if there is only one port defined do a simple tryWritePort() for this port
+		else {
+			await this.ns.clearPort(this.botports);
+		}
+	}
+	/**
+	 * Description:						creates a unique ID
+	 * 
+	 * @returns {string}				the unique ID
+	 */
+	createID() {
+		let partone = Math.ceil(Date.now()*Math.random()).toString(16);
+		let parttwo = Math.ceil(Date.now()*Math.random()).toString(16);
+		let partthree = Math.ceil(Date.now()*Math.random()).toString(16);
+		let partfour = Math.ceil(Date.now()*Math.random()).toString(16);
+		return partone.substring(0,5) + "-" + parttwo.substring(0,5) + "-" + partthree.substring(0,5) + "-" + partfour.substring(0,5);
+	}
+}
+/** Class representing functionallities to deliver/deploy scripts */
+export class DeliveryService {
+	/**
+	 * Description 							create DeliveryService
+	 * 
+	 * @param {NSObject} ns_ 				the Netscript object
+	 * @param {array} deployablescripts_	a list of deployable scripts
+	 */
+	constructor(ns_, deployablescripts_) {
+		//set the Netscript object
+		this.ns = ns_;
+		//set the deployable scripts
+		this.deployablescripts = deployablescripts_ || [];
+	}
+	/**
+	 * Description 						create DeliveryService
+	 * 
+	 * @param {} ns_ 					the Netscript object
+	 * @param {} settings_ 				an object of settings for deployment
+	 */
+	async deployScripts(server_, settings_) {
+		//get the servername
+		let server = server_ || "";
+		//get the settings from the settings parameter like should the scripts be replaced, run after deployment, etc.
+		let settings = {
+			replace: settings_.replace || false,
+			replaceforce: settings_.replaceforce || false,
+			runscript: settings_.runscript || "",
+			runbuffer: settings_.runbuffer || 0,
+			runthreads: settings_.runthreads || 1,
+			rundelay: settings_.rundelay || 1000
+		};
+		//check, if there are any deployable scripts
+		if(this.deployablescripts.length > 0) {
+			//run through the list of deployable scripts
+			for(let scriptname of this.deployablescripts) {
+				//if the deployable scripts do not exist, copy them
+				if(!this.ns.fileExists(scriptname, server)) {
+					await this.ns.scp(scriptname, server);
+				}
+				else {
+					//check, if scripts should generally be replaced
+					if(settings.replace) {
+						//if the deployable scripts are not running at the moment 
+						//remove them and copy them again (in case there were updates done on the home server)
+						if(!this.ns.scriptRunning(scriptname, server)) {
+							await this.ns.rm(scriptname, server);
+							await this.ns.scp(scriptname, server);
+						}
+					}
+					//check, if scripts should be forced to be replaced
+					if(settings.replaceforce) {
+						//as the replacement should be forced, kill the script, remove it and redeploy it
+						await this.ns.scriptKill(scriptname, server);
+						await this.ns.rm(scriptname, server);
+						await this.ns.scp(scriptname, server);
+					}
+				}
+			}
+			//after deployment, check if there is a script to run
+			if(settings.runscript && settings.runscript != "") {
+				//check, if the script to run is not running on the server AND the server's max ram
+				//let it run the runscript and additional scripts depending on the set buffer
+				if(!this.ns.scriptRunning(settings.runscript, server) && (this.ns.getServerMaxRam(server) > (this.ns.getScriptRam(settings.runscript, server) + settings.runbuffer))) {
+					//run script on the server
+					this.ns.exec(settings.runscript, server, settings.runthreads, settings.rundelay);
+				}
+			}
+		}
 	}
 }
