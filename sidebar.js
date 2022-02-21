@@ -9,15 +9,19 @@ export async function main(ns) {
 		ns.exit();
 	}
 	else {
-		//define an at exit function for this to delete HTML elements
-		ns.atExit(function() {
-			//check, if there is already a menu item with this id
-			if(document.getElementById(itemid)) {
-				//delete the menu item
-				document.getElementById(itemid).remove();
-			}
-			ns.toast("menu item " + itemname + " deleted", "error", 5000);
-		});
+		//try to make the atExit function
+		try {
+			//define an at exit function for this to delete HTML elements
+			ns.atExit(function() {
+				//check, if there is already a menu item with this id
+				if(document.getElementById(itemid)) {
+					//delete the menu item
+					document.getElementById(itemid).remove();
+				}
+				ns.toast("menu item " + itemname + " deleted", "error", 5000);
+			});
+		}
+		catch(e) {}
 		//define a variable to know which color and icon to show
 		let itemcolor;
 		let itemicon;
