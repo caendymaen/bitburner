@@ -14,6 +14,14 @@ export class RootServers {
 		this.servers = new ServerList(this.ns);
 	}
 	/**
+	 * Description:						returns a ServerList object
+	 * 
+	 * @returns {ServerList}			returns a ServerList object
+	 */
+	get serversObject() {
+		return this.servers;
+	}
+	/**
 	 * Description:						returns an array of servers, including some information for each of them
 	 * 
 	 * @returns {array}					returns an array of servers, including some information for each of them
